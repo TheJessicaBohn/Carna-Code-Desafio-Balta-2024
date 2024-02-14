@@ -1,9 +1,8 @@
 @page "/login"
-@using CarmaCode.Core.Domain.Contracts
-@using CarnaCode.Infra.Repository
-@using CarmaCode.Core.Application
-@inject IJSRuntime JsRuntime
+@using CarmaCode.Core.Application.DTOs
+@using CarmaCode.Core.Application.Contracts
 @inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
 
 <section class="container max-w-xl mt-20">
 	<form class="gap-1 rounded section-form px-5 pt-5 pb-10 flex flex-col items-center justify-center bg-white" method="post" @onsubmit="LoginAsync">
@@ -38,7 +37,7 @@
 			</button>
 		</div>
 		<div class="w-full flex">
-			<a class="w-full cursor-pointer text-center btn btn-secondary transition-all duration-500">
+			<a class="w-full cursor-pointer text-center btn btn-secondary transition-all duration-500" href="/register">
 				Não tenho um acesso
 			</a>
 		</div>
@@ -50,10 +49,9 @@
 	
 	protected override async Task OnInitializedAsync()
 	{
-		var authRepository = new AuthLocalStorageRepository(JsRuntime);
-		var auth = await authRepository.FindAllAsync();
+		var isLoggedIn = await AuthenticationService.IsLogged();
 
-		if (auth.Count() > 0)
+		if (isLoggedIn)
 		{
 			NavigationManager.NavigateTo("/imc");
 		}
@@ -61,10 +59,8 @@
 
 	private async Task LoginAsync()
 	{
-		var userRepository = new UserLocalStorageRepository(JsRuntime);
-		var authRepository = new AuthLocalStorageRepository(JsRuntime);
-		var loginUseCase = new LoginUseCase(userRepository, authRepository);
-		var auth = await loginUseCase.ExecuteAsync(LoginInput);
-		Console.WriteLine(auth);
+		await AuthenticationService.Login(LoginInput.Email, LoginInput.Password);
+		
+		NavigationManager.NavigateTo("/imc");
 	}
 }
