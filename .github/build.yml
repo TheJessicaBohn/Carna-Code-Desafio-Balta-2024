@@ -43,4 +43,4 @@ jobs:
                  with:
                     #Necessário criar uma chave ssh
                     github_token: ${{ secrets.SECRET_ACTION }}
-                    publish_dir: ./blazor
+                    publish_dir: cd blazor && dotnet build --no-restore
