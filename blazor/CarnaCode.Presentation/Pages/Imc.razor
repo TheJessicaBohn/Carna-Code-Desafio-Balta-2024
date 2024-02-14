@@ -7,8 +7,9 @@
 @inject IAddBmiOfUser AddBmiOfUserUseCase
 
 <section class="container max-w-xl mt-20">
-    <form class="gap-1 rounded section-form px-5 pt-5 pb-10 flex flex-col items-center justify-center bg-white" method="post" @onsubmit="Calculate">
-        <div class="flex flex-col gap-1">
+	<form class="gap-1 rounded section-form px-5 pt-5 pb-10 flex flex-col items-center justify-center bg-white"
+		method="post" @onsubmit="Calculate">
+		<div class="flex flex-col gap-1">
 			<h1 class="text-center text-4xl text-black">
 				Calcule seu IMC
 			</h1>
@@ -32,7 +33,7 @@
 				<span class="ml-2 text-gray">Eu tenho 65 anos ou mais</span>
 			</label>
 		</div>
-        <div class="w-full flex">
+		<div class="w-full flex">
 			<button type="submit" class="w-full cursor-pointer btn btn-primary transition-all duration-500">
 				Calcular meu IMC
 			</button>
@@ -42,13 +43,27 @@
 				Histórico
 			</a>
 		</div>
-    </form>
+	</form>
 </section>
+
+<ModalIMC Title="@ModalTitle" Content="@ModalContent" OnClose="CloseModal" IsVisible="@IsModalVisible"
+	ValueImc="@ValueImc" />
 
 @code {
 	private BodyMassIndex BodyMassIndex { get; set; } = new BodyMassIndex();
 	private bool IsElderly { get; set; } = default!;
 	private Guid UserId { get; set; } = default!;
+
+	// Modal
+	private bool IsModalVisible { get; set; }
+	public string ModalTitle { get; set; } = "Teste";
+	public string ModalContent { get; set; } = "Teste";
+	public double ValueImc { get; set; } = 30;
+
+	public void CloseModal()
+	{
+		IsModalVisible = false;
+	}
 
 	protected override async Task OnInitializedAsync()
 	{
