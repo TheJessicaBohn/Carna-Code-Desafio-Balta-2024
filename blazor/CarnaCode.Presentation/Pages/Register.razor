@@ -1,9 +1,8 @@
 @page "/register"
-@using CarmaCode.Core.Domain.Contracts
-@using CarmaCode.Core.Application
-@using CarnaCode.Infra.Repository
-@inject IJSRuntime JsRuntime
+@using CarmaCode.Core.Application.DTOs
+@using CarmaCode.Core.Application.Contracts
 @inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
 
 <section class="container max-w-xl mt-20">
 	<form class="gap-1 rounded section-form px-5 pt-5 pb-10 flex flex-col items-center justify-center bg-white" method="post" @onsubmit="RegisterAsync">
@@ -56,10 +55,7 @@
 
 	private async Task RegisterAsync()
 	{
-		var userRepository = new UserLocalStorageRepository(JsRuntime);
-		var createUserUseCase = new CreateUserUseCase(userRepository);
-		var createUserOutput = await createUserUseCase.ExecuteAsync(CreateUserInput);
-		
-		Console.WriteLine(createUserOutput);
+		await AuthenticationService.CreateUser(CreateUserInput.Name, CreateUserInput.Email, CreateUserInput.Password);
+		NavigationManager.NavigateTo("/login");
 	}
 }

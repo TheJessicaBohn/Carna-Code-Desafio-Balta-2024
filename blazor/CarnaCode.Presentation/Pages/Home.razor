@@ -1,7 +1,8 @@
 ﻿@page "/"
-@using CarnaCode.Infra.Repository
-@inject IJSRuntime JsRuntime
+@using CarmaCode.Core.Application.Contracts
 @inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
+
 <PageTitle>Home</PageTitle>
 
 <div>
@@ -11,15 +12,15 @@
 @code {
 	protected override async Task OnInitializedAsync()
 	{
-		var authRepository = new AuthLocalStorageRepository(JsRuntime);
-		var auth = await authRepository.FindAllAsync();
+		var isLoggedIn = await AuthenticationService.IsLogged();
 
-		if (auth.Count() > 0)
+		if (isLoggedIn)
 		{
-			NavigationManager.NavigateTo("/historic");
-			return;
+			NavigationManager.NavigateTo("/imc");
 		}
-		
-		NavigationManager.NavigateTo("/login");
+		else
+		{
+			NavigationManager.NavigateTo("/login");
+		}
 	}
 }

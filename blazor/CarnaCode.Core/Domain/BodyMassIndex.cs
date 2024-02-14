@@ -20,7 +20,7 @@ public class BodyMassIndex
     
     [Required]
     [EnumDataType(typeof(GenterType))]
-    public GenterType Gender { get; set; }
+    public GenterType? Gender { get; set; }
     
     public BMICategoryType CategoryType { get; set; }
     

@@ -6,22 +6,22 @@ namespace CarnaCode.Infra.Repository;
 
 public abstract class LocalStorageRepository<TModel> : IRepository<TModel>
 {
-    protected readonly IJSRuntime _jsRuntime;
+    protected readonly IJSRuntime JsRuntime;
     
     protected LocalStorageRepository(IJSRuntime jsRuntime)
     {
-        _jsRuntime = jsRuntime;
+        JsRuntime = jsRuntime;
     }
 
     public async Task<TModel> CreateAsync(TModel model)
     {
-        var oldJsonString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
+        var oldJsonString = await JsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
 
         if (string.IsNullOrEmpty(oldJsonString))
         {
             var newJson = JsonSerializer.Serialize(new[] {model});
             
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", typeof(TModel).Name, newJson);
+            await JsRuntime.InvokeVoidAsync("localStorage.setItem", typeof(TModel).Name, newJson);
         }
         else
         {
@@ -31,7 +31,7 @@ public abstract class LocalStorageRepository<TModel> : IRepository<TModel>
             
             var newJson = JsonSerializer.Serialize(newModels);
             
-            await _jsRuntime.InvokeVoidAsync("localStorage.setItem", typeof(TModel).Name, newJson);
+            await JsRuntime.InvokeVoidAsync("localStorage.setItem", typeof(TModel).Name, newJson);
         }
         
         return model;
@@ -39,7 +39,7 @@ public abstract class LocalStorageRepository<TModel> : IRepository<TModel>
 
     public async Task<TModel?> FindByIdAsync(Guid id)
     {
-        var jsonString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
+        var jsonString = await JsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
         
         if (string.IsNullOrEmpty(jsonString))
         {
@@ -60,14 +60,14 @@ public abstract class LocalStorageRepository<TModel> : IRepository<TModel>
 
     public async Task<IEnumerable<TModel>> FindAllAsync()
     {
-        var jsonString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
+        var jsonString = await JsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
         
         return JsonSerializer.Deserialize<IEnumerable<TModel>>(jsonString) ?? Enumerable.Empty<TModel>();
     }
 
     public async Task<TModel> UpdateAsync(Guid id, TModel model)
     {
-        var jsonString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
+        var jsonString = await JsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
         
         var models = JsonSerializer.Deserialize<IEnumerable<TModel>>(jsonString);
         
@@ -82,14 +82,14 @@ public abstract class LocalStorageRepository<TModel> : IRepository<TModel>
         
         var newJson = JsonSerializer.Serialize(newModels);
         
-        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", typeof(TModel).Name, newJson);
+        await JsRuntime.InvokeVoidAsync("localStorage.setItem", typeof(TModel).Name, newJson);
         
         return model;
     }
 
     public async Task DeleteAsync(Guid id)
     {
-        var jsonString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
+        var jsonString = await JsRuntime.InvokeAsync<string>("localStorage.getItem", typeof(TModel).Name);
         
         var models = JsonSerializer.Deserialize<IEnumerable<TModel>>(jsonString);
         
@@ -109,6 +109,6 @@ public abstract class LocalStorageRepository<TModel> : IRepository<TModel>
         
         var newJson = JsonSerializer.Serialize(newModels);
         
-        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", typeof(TModel).Name, newJson);
+        await JsRuntime.InvokeVoidAsync("localStorage.setItem", typeof(TModel).Name, newJson);
     }
 }

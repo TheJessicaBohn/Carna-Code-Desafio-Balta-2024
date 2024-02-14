@@ -260,7 +260,7 @@ input, select {
   border-radius: 0.50rem;
 }
 
-input::placeholder {
+input::placeholder, option {
   color: #BDBDBD;
 }
 
