@@ -1,10 +1,10 @@
 @page "/imc"
 @using CarmaCode.Core.Domain
-@using CarmaCode.Core.Application
+@using CarmaCode.Core.Application.Contracts
 @using CarmaCode.Core.Domain.Contracts
-@using CarnaCode.Infra.Repository
-@inject IJSRuntime JsRuntime
 @inject NavigationManager NavigationManager
+@inject IAuthenticationService AuthenticationService
+@inject IAddBmiOfUser AddBmiOfUserUseCase
 
 <section class="container max-w-xl mt-20">
     <form class="gap-1 rounded section-form px-5 pt-5 pb-10 flex flex-col items-center justify-center bg-white" method="post" @onsubmit="Calculate">
@@ -20,9 +20,9 @@
             <input class="w-full" id="weight" placeholder="Peso" type="text" @bind="BodyMassIndex.Weight" />
         </div>
         <div class="w-full">
-	        <select class="w-full" id="gender" placeholder="Sexo" @bind="BodyMassIndex.Gender">
-		        <option selected>Selecione seu sexo</option>
-		        <option value="@GenterType.Male)">Masculino</option>
+	        <select class="w-full" id="gender" @bind="BodyMassIndex.Gender">
+		        <option value="" selected>Selecione seu sexo</option>
+		        <option value="@GenterType.Male">Masculino</option>
 		        <option value="@GenterType.Female">Feminino</option>
 	        </select>
         </div>
@@ -38,8 +38,7 @@
 			</button>
 		</div>
 		<div class="w-full flex">
-			<a class="w-full cursor-pointer text-center btn btn-secondary transition-all duration-500" @onclick='() => { NavigationManager.NavigateTo("/historic"); }'>
-				@* Entenda o cálculo *@
+			<a class="w-full cursor-pointer text-center btn btn-secondary transition-all duration-500" @onclick='() => { NavigationManager.NavigateTo("/history"); }'>
 				Histórico
 			</a>
 		</div>
@@ -48,16 +47,13 @@
 
 @code {
 	private BodyMassIndex BodyMassIndex { get; set; } = new BodyMassIndex();
-	private bool IsElderly { get; set; }
-	private string Token { get; set; }
+	private bool IsElderly { get; set; } = default!;
+	private Guid UserId { get; set; } = default!;
 
 	protected override async Task OnInitializedAsync()
 	{
-		var authRepository = new AuthLocalStorageRepository(JsRuntime);
-		var auths = await authRepository.FindAllAsync();
-		var auth = auths.FirstOrDefault();
-
-		Token = auth!.Token;
+		var user = await AuthenticationService.GetUser();
+		UserId = user.Id;
 	}
 
 	private async Task Calculate()
@@ -66,15 +62,12 @@
 		BodyMassIndex.Calculate();
 		BodyMassIndex.Categorize();
 
-		var bmiRepository = new BmiLocalStorageRepository(JsRuntime);
-		var addBmiOfUserUseCase = new AddBmiOfUserUseCase(bmiRepository);
-
 		var addBmiOfUserInput = new AddBmiOfUserInput
 		{
 			BodyMassIndex = BodyMassIndex,
-			UserId = Guid.Parse(Token)
+			UserId = UserId,
 		};
 
-		await addBmiOfUserUseCase.ExecuteAsync(addBmiOfUserInput);
+		await AddBmiOfUserUseCase.ExecuteAsync(addBmiOfUserInput);
 	}
 }

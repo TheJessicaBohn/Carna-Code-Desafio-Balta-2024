@@ -13,7 +13,7 @@ public class UserLocalStorageRepository : LocalStorageRepository<User>, IUserRep
 
     public async Task<User?> FindByEmail(string email)
     {
-        var jsonString = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", nameof(User));
+        var jsonString = await JsRuntime.InvokeAsync<string>("localStorage.getItem", nameof(User));
         
         if (string.IsNullOrEmpty(jsonString))
         {
